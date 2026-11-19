@@ -1,0 +1,21 @@
+=== GIVEN INSTANCE ===
+Order of consideration: ['A', 'C', 'D', 'B', 'E'] | slots 1..3
+  A(d=2,p=80) -> slot 2   slots=[None, 'A', None] profit=80
+  C(d=2,p=60) -> slot 1   slots=['C', 'A', None] profit=140
+  D(d=3,p=40) -> slot 3   slots=['C', 'A', 'D'] profit=180
+  B(d=1,p=35) -> REJECTED (no free slot <= 1)   slots=['C', 'A', 'D'] profit=180
+  E(d=1,p=25) -> REJECTED (no free slot <= 1)   slots=['C', 'A', 'D'] profit=180
+Schedule: ['C', 'A', 'D'] Total profit: 180
+
+=== MODIFIED INSTANCE (A profit 80 -> 30) ===
+Order of consideration: ['C', 'D', 'B', 'A', 'E'] | slots 1..3
+  C(d=2,p=60) -> slot 2   slots=[None, 'C', None] profit=60
+  D(d=3,p=40) -> slot 3   slots=[None, 'C', 'D'] profit=100
+  B(d=1,p=35) -> slot 1   slots=['B', 'C', 'D'] profit=135
+  A(d=2,p=30) -> REJECTED (no free slot <= 2)   slots=['B', 'C', 'D'] profit=135
+  E(d=1,p=25) -> REJECTED (no free slot <= 1)   slots=['B', 'C', 'D'] profit=135
+Schedule: ['B', 'C', 'D'] Total profit: 135
+
+=== BRUTE-FORCE CHECK (all subsets, all orders) ===
+Greedy base = 180 | brute force = 180
+Greedy mod  = 135 | brute force = 135

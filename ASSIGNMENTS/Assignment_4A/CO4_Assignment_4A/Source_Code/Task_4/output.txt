@@ -1,0 +1,50 @@
+=== FAILING INPUT: Text='catdog', Dictionary={'dog'} ===
+Correct answer should be FALSE ('cat' is not a dictionary word)
+-- Faulty algorithm trace --
+  i=1: no substring ending here in dictionary -> DP[1]=FALSE
+  i=2: no substring ending here in dictionary -> DP[2]=FALSE
+  i=3: no substring ending here in dictionary -> DP[3]=FALSE
+  i=4: no substring ending here in dictionary -> DP[4]=FALSE
+  i=5: no substring ending here in dictionary -> DP[5]=FALSE
+  i=6: j=3 substring 'dog' in dictionary -> DP[6]=TRUE
+Faulty  result: True DP = [True, False, False, False, False, False, True]
+-- Fixed algorithm trace --
+  i=1: no j with DP[j]=TRUE and word text[j:i] -> DP[1]=FALSE
+  i=2: no j with DP[j]=TRUE and word text[j:i] -> DP[2]=FALSE
+  i=3: no j with DP[j]=TRUE and word text[j:i] -> DP[3]=FALSE
+  i=4: no j with DP[j]=TRUE and word text[j:i] -> DP[4]=FALSE
+  i=5: no j with DP[j]=TRUE and word text[j:i] -> DP[5]=FALSE
+  i=6: no j with DP[j]=TRUE and word text[j:i] -> DP[6]=FALSE
+Fixed   result: False DP = [True, False, False, False, False, False, False]
+
+=== REGRESSION INPUT: Text='applepen', Dictionary={'apple','pen'} ===
+-- Faulty algorithm trace --
+  i=1: no substring ending here in dictionary -> DP[1]=FALSE
+  i=2: no substring ending here in dictionary -> DP[2]=FALSE
+  i=3: no substring ending here in dictionary -> DP[3]=FALSE
+  i=4: no substring ending here in dictionary -> DP[4]=FALSE
+  i=5: j=0 substring 'apple' in dictionary -> DP[5]=TRUE
+  i=6: no substring ending here in dictionary -> DP[6]=FALSE
+  i=7: no substring ending here in dictionary -> DP[7]=FALSE
+  i=8: j=5 substring 'pen' in dictionary -> DP[8]=TRUE
+Faulty  result: True
+-- Fixed algorithm trace --
+  i=1: no j with DP[j]=TRUE and word text[j:i] -> DP[1]=FALSE
+  i=2: no j with DP[j]=TRUE and word text[j:i] -> DP[2]=FALSE
+  i=3: no j with DP[j]=TRUE and word text[j:i] -> DP[3]=FALSE
+  i=4: no j with DP[j]=TRUE and word text[j:i] -> DP[4]=FALSE
+  i=5: j=0 DP[0]=TRUE and 'apple' in dictionary -> DP[5]=TRUE
+  i=6: no j with DP[j]=TRUE and word text[j:i] -> DP[6]=FALSE
+  i=7: no j with DP[j]=TRUE and word text[j:i] -> DP[7]=FALSE
+  i=8: j=5 DP[5]=TRUE and 'pen' in dictionary -> DP[8]=TRUE
+Fixed   result: True
+
+=== EXTRA TEST CASES (expected vs fixed vs faulty) ===
+Text='leetcode'   Dict=['code', 'leet']             expected=True  fixed=True  faulty=True
+Text='catsandog'  Dict=['and', 'cat', 'cats', 'dog', 'sand'] expected=False fixed=False faulty=True
+Text='abcd'       Dict=['b', 'cd']                  expected=False fixed=False faulty=True
+Text=''           Dict=['a']                        expected=True  fixed=True  faulty=True
+Text='aaaa'       Dict=['a', 'aa']                  expected=True  fixed=True  faulty=True
+Text='xyz'        Dict=[]                           expected=False fixed=False faulty=False
+Text='abab'       Dict=['ab']                       expected=True  fixed=True  faulty=True
+Text='abc'        Dict=['c']                        expected=False fixed=False faulty=True

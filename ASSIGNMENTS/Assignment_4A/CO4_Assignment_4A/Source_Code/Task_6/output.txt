@@ -1,0 +1,39 @@
+===== GIVEN DATASET : DP =====
+k=1 J1 (s=1,f=3,v=20) p=0 include=20+OPT[0]=20 exclude=OPT[0]=0 -> OPT[1]=20
+k=2 J2 (s=2,f=5,v=50) p=0 include=50+OPT[0]=50 exclude=OPT[1]=20 -> OPT[2]=50
+k=3 J3 (s=4,f=6,v=30) p=1 include=30+OPT[1]=50 exclude=OPT[2]=50 -> OPT[3]=50
+k=4 J4 (s=6,f=8,v=40) p=3 include=40+OPT[3]=90 exclude=OPT[3]=50 -> OPT[4]=90
+k=5 J5 (s=5,f=9,v=60) p=2 include=60+OPT[2]=110 exclude=OPT[4]=90 -> OPT[5]=110
+k=6 J6 (s=8,f=10,v=30) p=4 include=30+OPT[4]=120 exclude=OPT[5]=110 -> OPT[6]=120
+k=7 J7 (s=9,f=11,v=50) p=5 include=50+OPT[5]=160 exclude=OPT[6]=120 -> OPT[7]=160
+k=8 J8 (s=11,f=13,v=40) p=7 include=40+OPT[7]=200 exclude=OPT[7]=160 -> OPT[8]=200
+p[1..8] = [0, 0, 1, 3, 2, 4, 5, 7] 
+OPT[0..8] = [0, 20, 50, 50, 90, 110, 120, 160, 200]
+Selected jobs: ['J2', 'J5', 'J7', 'J8'] | Maximum energy saving: 200
+Brute force  : (200, ['J2', 'J5', 'J7', 'J8'])
+
+Strategy comparison on the given data:
+  earliest-finish greedy : (160, ['J1', 'J3', 'J4', 'J6', 'J8'])
+  highest-value greedy   : (200, ['J5', 'J2', 'J7', 'J8'])
+  shortest-job greedy    : (160, ['J1', 'J3', 'J4', 'J6', 'J8'])
+
+===== ADVERSARIAL SET A (defeats earliest-finish & shortest-job greedy) =====
+k=1 A2 (s=0,f=3,v=10) p=0 include=10+OPT[0]=10 exclude=OPT[0]=0 -> OPT[1]=10
+k=2 A3 (s=3,f=6,v=10) p=1 include=10+OPT[1]=20 exclude=OPT[1]=10 -> OPT[2]=20
+k=3 A5 (s=2,f=7,v=25) p=0 include=25+OPT[0]=25 exclude=OPT[2]=20 -> OPT[3]=25
+k=4 A4 (s=6,f=9,v=10) p=2 include=10+OPT[2]=30 exclude=OPT[3]=25 -> OPT[4]=30
+k=5 A1 (s=0,f=10,v=100) p=0 include=100+OPT[0]=100 exclude=OPT[4]=30 -> OPT[5]=100
+DP: 100 ['A1'] | brute: (100, ['A1'])
+earliest-finish: (30, ['A2', 'A3', 'A4']) | highest-value: (100, ['A1']) | shortest: (30, ['A2', 'A3', 'A4'])
+
+===== ADVERSARIAL SET B (defeats highest-value greedy) =====
+k=1 B2 (s=0,f=4,v=60) p=0 include=60+OPT[0]=60 exclude=OPT[0]=0 -> OPT[1]=60
+k=2 B5 (s=3,f=6,v=20) p=0 include=20+OPT[0]=20 exclude=OPT[1]=60 -> OPT[2]=60
+k=3 B3 (s=4,f=7,v=60) p=1 include=60+OPT[1]=120 exclude=OPT[2]=60 -> OPT[3]=120
+k=4 B1 (s=0,f=10,v=100) p=0 include=100+OPT[0]=100 exclude=OPT[3]=120 -> OPT[4]=120
+k=5 B4 (s=7,f=10,v=60) p=3 include=60+OPT[3]=180 exclude=OPT[4]=120 -> OPT[5]=180
+DP: 180 ['B2', 'B3', 'B4'] | brute: (180, ['B2', 'B3', 'B4'])
+earliest-finish: (180, ['B2', 'B3', 'B4']) | highest-value: (100, ['B1']) | shortest: (180, ['B3', 'B4', 'B2'])
+
+===== RANDOMISED VALIDATION: DP vs brute force (300 instances) =====
+mismatches: 0

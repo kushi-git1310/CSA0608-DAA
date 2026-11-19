@@ -1,0 +1,79 @@
+===== 5.1 DIJKSTRA from A =====
+SELECT A (dist=0) | finalised=['A']
+   relax A->B: 0+4=4 < inf => update, pred[B]=A
+   relax A->C: 0+7=7 < inf => update, pred[C]=A
+SELECT B (dist=4) | finalised=['A', 'B']
+   relax B->C: 4+2=6 < 7 => update, pred[C]=B
+   relax B->D: 4+6=10 < inf => update, pred[D]=B
+SELECT C (dist=6) | finalised=['A', 'B', 'C']
+   relax C->D: 6+1=7 < 10 => update, pred[D]=C
+   relax C->E: 6+8=14 < inf => update, pred[E]=C
+SELECT D (dist=7) | finalised=['A', 'B', 'C', 'D']
+   relax D->E: 7+3=10 < 14 => update, pred[E]=D
+SELECT E (dist=10) | finalised=['A', 'B', 'C', 'D', 'E']
+dist[A]=0  path=A
+dist[B]=4  path=A->B
+dist[C]=6  path=A->B->C
+dist[D]=7  path=A->B->C->D
+dist[E]=10  path=A->B->C->D->E
+
+===== 5.2 BELLMAN-FORD from A (same graph) =====
+pass 1: {'A': 0, 'B': 4, 'C': 6, 'D': 7, 'E': 10}
+pass 2: {'A': 0, 'B': 4, 'C': 6, 'D': 7, 'E': 10}
+Final: {'A': 0, 'B': 4, 'C': 6, 'D': 7, 'E': 10} | negative cycle reachable: False
+
+--- Dijkstra FAILS with a negative edge: A->B 2, A->C 3, C->B -2 ---
+Dijkstra : {'A': 0, 'B': 2, 'C': 3}
+BellmanFd: {'A': 0, 'B': 1, 'C': 3}  (true dist[B] = 1)
+
+--- Negative cycle: A->B 1, B->C -3, C->B 1 ---
+pass 1: {'A': 0, 'B': -1, 'C': -2}
+pass 2: {'A': 0, 'B': -3, 'C': -4}
+negative cycle detected: True
+
+===== 5.3 FLOYD-WARSHALL all pairs =====
+D(0) (direct edges only)
+         A    B    C    D    E
+  A:     0    4    7  INF  INF
+  B:   INF    0    2    6  INF
+  C:   INF  INF    0    1    8
+  D:   INF  INF  INF    0    3
+  E:   INF  INF  INF  INF    0
+D(1) (intermediates allowed: ['A'])
+         A    B    C    D    E
+  A:     0    4    7  INF  INF
+  B:   INF    0    2    6  INF
+  C:   INF  INF    0    1    8
+  D:   INF  INF  INF    0    3
+  E:   INF  INF  INF  INF    0
+D(2) (intermediates allowed: ['A', 'B'])
+         A    B    C    D    E
+  A:     0    4    6   10  INF
+  B:   INF    0    2    6  INF
+  C:   INF  INF    0    1    8
+  D:   INF  INF  INF    0    3
+  E:   INF  INF  INF  INF    0
+D(3) (intermediates allowed: ['A', 'B', 'C'])
+         A    B    C    D    E
+  A:     0    4    6    7   14
+  B:   INF    0    2    3   10
+  C:   INF  INF    0    1    8
+  D:   INF  INF  INF    0    3
+  E:   INF  INF  INF  INF    0
+D(4) (intermediates allowed: ['A', 'B', 'C', 'D'])
+         A    B    C    D    E
+  A:     0    4    6    7   10
+  B:   INF    0    2    3    6
+  C:   INF  INF    0    1    4
+  D:   INF  INF  INF    0    3
+  E:   INF  INF  INF  INF    0
+D(5) (intermediates allowed: ['A', 'B', 'C', 'D', 'E'])
+         A    B    C    D    E
+  A:     0    4    6    7   10
+  B:   INF    0    2    3    6
+  C:   INF  INF    0    1    4
+  D:   INF  INF  INF    0    3
+  E:   INF  INF  INF  INF    0
+
+Cross-check with Dijkstra from every source:
+Floyd == repeated Dijkstra: True

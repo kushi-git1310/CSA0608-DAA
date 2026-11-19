@@ -1,0 +1,24 @@
+=== TEST 1: capacity 50 ===
+Sorted by ratio: [('P1', 6.0), ('P2', 5.0), ('P3', 4.0)]
+  take P1: fraction=1.00 weight=10.0 value=60.0 remaining=40.0 total=60.0
+  take P2: fraction=1.00 weight=20.0 value=100.0 remaining=20.0 total=160.0
+  take P3: fraction=0.67 weight=20.0 value=80.0 remaining=0.0 total=240.0
+TOTAL VALUE = 240.0 | UNUSED CAPACITY = 0.0
+
+=== TEST 2: capacity 0 (boundary) ===
+Sorted by ratio: [('P1', 6.0), ('P2', 5.0), ('P3', 4.0)]
+TOTAL VALUE = 0.0
+
+=== TEST 3: capacity larger than all packages ===
+Sorted by ratio: [('P1', 6.0), ('P2', 5.0), ('P3', 4.0)]
+  take P1: fraction=1.00 weight=10.0 value=60.0 remaining=90.0 total=60.0
+  take P2: fraction=1.00 weight=20.0 value=100.0 remaining=70.0 total=160.0
+  take P3: fraction=1.00 weight=30.0 value=120.0 remaining=40.0 total=280.0
+TOTAL VALUE = 280.0 | UNUSED CAPACITY = 40.0
+
+=== TEST 4: all same ratio ===
+Sorted by ratio: [('B', 2.0), ('A', 2.0), ('C', 2.0)]
+  take B: fraction=1.00 weight=2.0 value=4.0 remaining=5.0 total=4.0
+  take A: fraction=1.00 weight=4.0 value=8.0 remaining=1.0 total=12.0
+  take C: fraction=0.17 weight=1.0 value=2.0 remaining=0.0 total=14.0
+TOTAL VALUE = 14.0

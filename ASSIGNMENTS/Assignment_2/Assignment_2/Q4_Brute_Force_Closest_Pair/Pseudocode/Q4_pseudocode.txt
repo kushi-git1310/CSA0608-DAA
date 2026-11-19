@@ -1,0 +1,17 @@
+QUE 4 – PSEUDOCODE
+Brute-Force Closest Pair of 2D Points
+
+CLOSEST-PAIR(points):
+    best_pair = NONE; best_distance_squared = INFINITY
+    pairs_examined = 0
+    FOR i = 0 TO n-2:
+        FOR j = i+1 TO n-1:       # j starts at i+1, so no duplicate pairs
+            pairs_examined++
+            dx = x[i] - x[j]; dy = y[i] - y[j]
+            distance_squared = dx*dx + dy*dy
+            IF distance_squared < best_distance_squared:
+                update best distance and pair
+    RETURN best_pair, sqrt(best_distance_squared), pairs_examined
+
+Unique pairs = n(n-1)/2 because each of n points pairs with n-1 others, and each pair is counted twice:
+n(n-1)/2. Test multiple n values and compare observed pair counts with this formula.

@@ -1,0 +1,27 @@
+QUE 7 – PSEUDOCODE
+Diagnose and redesign repeated Sequential Search using a dictionary index
+
+ORIGINAL:
+FOR each lookup target:
+    scan every record from the beginning
+    compare tool ID until found or list ends
+
+REDESIGN:
+BUILD-INDEX(records):
+    index = empty dictionary
+    FOR each record in records:
+        index[record.tool_id] = record
+    RETURN index
+
+LOOKUP(index, target):
+    IF target exists in index:
+        RETURN index[target]
+    ELSE:
+        RETURN NOT_FOUND
+
+Validation plan:
+- Use the same tool records and repeated lookup targets for both methods.
+- Count sequential comparisons.
+- Count index construction entries and dictionary lookups.
+- Expected: sequential search grows with list length per query; indexed lookup is average O(1)
+  after O(n) preprocessing, at the cost of extra memory.

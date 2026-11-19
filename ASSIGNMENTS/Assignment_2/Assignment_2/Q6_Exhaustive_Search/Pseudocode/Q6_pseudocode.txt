@@ -1,0 +1,20 @@
+QUE 6 – PSEUDOCODE
+Exhaustive Search for a 0/1 Package Selection Problem
+
+EXHAUSTIVE-PACKAGES(weights, values, capacity):
+    best_value = 0; best_subset = empty
+    candidates = 0
+    FOR mask = 0 TO 2^n - 1:
+        total_weight = 0; total_value = 0; subset = empty
+        FOR i = 0 TO n-1:
+            IF bit i of mask is 1:
+                add package i to subset
+                total_weight += weights[i]
+                total_value += values[i]
+        candidates++
+        IF total_weight <= capacity AND total_value > best_value:
+            best_value = total_value; best_subset = subset
+    RETURN best_subset, best_value, candidates
+
+Every package is either selected or not selected, so there are 2^n subsets.
+For small n, enumerate every subset to verify the optimum independently.

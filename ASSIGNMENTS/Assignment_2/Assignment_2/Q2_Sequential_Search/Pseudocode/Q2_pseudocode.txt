@@ -1,0 +1,18 @@
+QUE 2 – PSEUDOCODE
+Sequential Search for a Tool ID
+
+SEQUENTIAL-SEARCH(records, target):
+    comparisons = 0
+    FOR index = 0 TO length(records)-1:
+        comparisons++
+        IF records[index].tool_id == target:
+            RETURN index, comparisons
+    RETURN NOT_FOUND, comparisons
+
+EXPERIMENT:
+- Successful target at first, middle and last positions.
+- Unsuccessful target absent from the list.
+- Repeat for different list sizes.
+- Worst-case comparisons are n; average successful comparisons are about (n+1)/2 for equally likely positions.
+- Sequential search is suitable for small or frequently changing lists and infrequent lookups.
+- For many records and frequent queries, consider an index/hash table; account for preprocessing and memory.

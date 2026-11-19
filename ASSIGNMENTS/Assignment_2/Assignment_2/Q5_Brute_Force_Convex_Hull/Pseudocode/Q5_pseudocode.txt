@@ -1,0 +1,23 @@
+QUE 5 – PSEUDOCODE
+Brute-Force Convex Hull using the all-points-on-one-side principle
+
+ORIENTATION(A, B, P):
+    return (B.x-A.x)*(P.y-A.y) - (B.y-A.y)*(P.x-A.x)
+
+BRUTE-HULL(points):
+    edges = empty set
+    FOR each pair A, B with A != B:
+        has_positive = false; has_negative = false
+        FOR each point P other than A and B:
+            cross = ORIENTATION(A, B, P)
+            IF cross > 0: has_positive = true
+            IF cross < 0: has_negative = true
+        IF NOT (has_positive AND has_negative):
+            add undirected edge {A,B} to edges
+    Build boundary order from hull vertices (for this implementation, use a monotonic
+    chain ordering after the brute-force edge test to display unique boundary vertices).
+    RETURN hull vertices
+
+The orientation/cross-product sign tells which side of line AB a point lies on.
+If points occur on both sides, AB cannot be a hull boundary edge.
+Collinear points need special handling; this sample returns the extreme hull vertices.

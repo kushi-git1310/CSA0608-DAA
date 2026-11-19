@@ -1,0 +1,50 @@
+QUE 1 – PSEUDOCODE
+Selection Sort, Bubble Sort, Insertion Sort
+
+FOR each algorithm:
+    copy input array
+    comparisons = 0; movements = 0
+    run selected algorithm while counting comparisons and swaps/shifts
+    return sorted array and counts
+
+SELECTION-SORT(A):
+    FOR i = 0 TO length(A)-2:
+        minIndex = i
+        FOR j = i+1 TO length(A)-1:
+            comparisons++
+            IF A[j] < A[minIndex]: minIndex = j
+        IF minIndex != i:
+            swap A[i], A[minIndex]
+            swaps++
+    RETURN A, comparisons, swaps
+
+BUBBLE-SORT(A):
+    FOR end = length(A)-1 DOWNTO 1:
+        swapped = false
+        FOR j = 0 TO end-1:
+            comparisons++
+            IF A[j] > A[j+1]:
+                swap A[j], A[j+1]
+                swaps++; swapped = true
+        IF swapped == false: BREAK
+    RETURN A, comparisons, swaps
+
+INSERTION-SORT(A):
+    shifts = 0; comparisons = 0
+    FOR i = 1 TO length(A)-1:
+        key = A[i]; j = i-1
+        WHILE j >= 0:
+            comparisons++
+            IF A[j] > key:
+                A[j+1] = A[j]; shifts++; j--
+            ELSE: BREAK
+        A[j+1] = key
+    RETURN A, comparisons, shifts
+
+TEST DATA:
+1) Nearly/already sorted: [10, 20, 30, 40, 50, 60]
+2) Reverse ordered: [60, 50, 40, 30, 20, 10]
+3) Edge case: [] and [7] (also test duplicates if desired)
+
+For the stated workload where about 95% of the list is already ordered and small batches are inserted,
+Insertion Sort is a reasonable choice because it performs few shifts on nearly sorted data.

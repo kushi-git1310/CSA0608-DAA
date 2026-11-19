@@ -1,0 +1,19 @@
+QUE 3 – PSEUDOCODE
+Brute-Force String Matching
+
+BRUTE-FORCE-MATCH(text, pattern):
+    n = length(text); m = length(pattern); comparisons = 0
+    FOR shift = 0 TO n-m:
+        j = 0
+        WHILE j < m:
+            comparisons++
+            IF text[shift+j] != pattern[j]: BREAK
+            j++
+        IF j == m: RETURN shift, comparisons
+    RETURN NOT_FOUND, comparisons
+
+Design test cases:
+1) Low work: text='abcdefghijk', pattern='z' (mismatch immediately at each shift).
+2) Repeated-prefix worst-style case: text='aaaaaaaaab', pattern='aaaab'.
+3) Additional case: pattern occurs near the end.
+Count character comparisons, not just text length. Worst-case time is O((n-m+1)m).

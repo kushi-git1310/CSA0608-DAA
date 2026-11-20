@@ -1,0 +1,124 @@
+##############################################################################
+TASK 6.1 / 6.2  MODEL AND DP STATE
+##############################################################################
+Input     : (n+1)x(n+1) cost matrix, hub = index 0
+Output    : closed tour Hub -> all n locations once -> Hub, and its total cost
+Objective : minimise total travel cost
+Constraints: each location exactly once; start and end at the hub; costs non-negative
+State     : DP[S][j] = cheapest way to leave the hub, visit exactly the set S, finish at j (j in S)
+Base      : DP[{j}][j] = cost[Hub][j]
+Recurrence: DP[S][j] = min_{k in S-{j}} ( DP[S-{j}][k] + cost[k][j] )
+Final     : OPT = min_j ( DP[ALL][j] + cost[j][Hub] )
+Why 'current location' alone is not enough: Hub->A->B->C and Hub->B->A->C both end at C but
+have visited the same SET in different orders with different costs; two partial routes are
+comparable only if they have the same visited set AND the same current location.
+
+##############################################################################
+TASK 6.3  ROUTE OPTIMISATION ENGINE  (hub + 6 locations)
+##############################################################################
+Cost matrix:
+        Hub    A    B    C    D    E    F
+  Hub     0   12   29   22   13   24   19
+    A    12    0   19    3   25    6   33
+    B    29   19    0   21   23   20   15
+    C    22    3   21    0    4   12   17
+    D    13   25   23    4    0    9   14
+    E    24    6   20   12    9    0   11
+    F    19   33   15   17   14   11    0
+
+Optimal route (order of visits):
+   stop 1: F   (leg cost 19)
+   stop 2: B   (leg cost 15)
+   stop 3: E   (leg cost 20)
+   stop 4: A   (leg cost 6)
+   stop 5: C   (leg cost 3)
+   stop 6: D   (leg cost 4)
+   return : Hub   (leg cost 13)
+
+Route : Hub -> F -> B -> E -> A -> C -> D -> Hub
+Minimum Travel Cost = 80
+Independent re-addition of legs = 80
+DP statistics: {'states': 192, 'transitions': 480, 'table_entries': 384}
+
+##############################################################################
+TASK 6.4  VALIDATION (hub + 4 locations, exhaustive enumeration of 4! = 24 routes)
+##############################################################################
+Cost matrix (Hub, A, B, C, D):
+        Hub    A    B    C    D
+  Hub     0   12   29   22   13
+    A    12    0   19    3   25
+    B    29   19    0   21   23
+    C    22    3   21    0    4
+    D    13   25   23    4    0
+
+  #  Route                            Cost
+  1  Hub -> B -> A -> C -> D -> Hub     68  <-- minimum
+  2  Hub -> D -> C -> A -> B -> Hub     68  <-- minimum
+  3  Hub -> A -> B -> C -> D -> Hub     69
+  4  Hub -> D -> C -> B -> A -> Hub     69
+  5  Hub -> A -> C -> D -> B -> Hub     71
+  6  Hub -> B -> D -> C -> A -> Hub     71
+  7  Hub -> A -> C -> B -> D -> Hub     72
+  8  Hub -> D -> B -> C -> A -> Hub     72
+  9  Hub -> A -> B -> D -> C -> Hub     80
+ 10  Hub -> C -> A -> B -> D -> Hub     80
+ 11  Hub -> C -> D -> B -> A -> Hub     80
+ 12  Hub -> D -> B -> A -> C -> Hub     80
+ 13  Hub -> A -> D -> C -> B -> Hub     91
+ 14  Hub -> B -> C -> A -> D -> Hub     91
+ 15  Hub -> B -> C -> D -> A -> Hub     91
+ 16  Hub -> D -> A -> C -> B -> Hub     91
+ 17  Hub -> B -> A -> D -> C -> Hub     99
+ 18  Hub -> C -> D -> A -> B -> Hub     99
+ 19  Hub -> C -> B -> A -> D -> Hub    100
+ 20  Hub -> D -> A -> B -> C -> Hub    100
+ 21  Hub -> B -> D -> A -> C -> Hub    102
+ 22  Hub -> C -> A -> D -> B -> Hub    102
+ 23  Hub -> A -> D -> B -> C -> Hub    103
+ 24  Hub -> C -> B -> D -> A -> Hub    103
+
+Exhaustive optimum = 68   DP optimum = 68   -> MATCH
+Exhaustive tour(s) with that cost: ['Hub -> B -> A -> C -> D -> Hub', 'Hub -> D -> C -> A -> B -> Hub']
+DP tour: Hub -> D -> C -> A -> B -> Hub  (a reversed tour has the same cost for a symmetric matrix)
+Randomised validation: 300 asymmetric instances (n=1..7), DP vs exhaustive, mismatches = 0
+Boundary / failure tests:
+   hub only (n=0)            -> (0, [0, 0])
+   one location (n=1)        -> (16, [0, 1, 0]) (7 + 9)
+   no road into B (INF)      -> (inf, None) (no feasible tour reported, not a wrong number)
+   ragged matrix             -> rejected: cost matrix must be square and non-empty
+   negative cost             -> rejected: travel costs must be non-negative
+
+##############################################################################
+TASK 6.5  STATE-SPACE GROWTH (random asymmetric instances, seed 2026)
+##############################################################################
+  n  DP states  transitions  table entries  time (s)  time ratio  tracemalloc peak (MB)  theory n*2^(n-1)
+  4         32           48             64    0.0000           -                   0.00                32
+  5         80          160            160    0.0001       1.97x                   0.00                80
+  6        192          480            384    0.0001       2.46x                   0.01               192
+  7        448         1344            896    0.0004       2.60x                   0.03               448
+  8       1024         3584           2048    0.0010       2.58x                   0.06              1024
+  9       2304         9216           4608    0.0023       2.31x                   0.14              2304
+ 10       5120        23040          10240    0.0060       2.65x                   0.29              5120
+ 11      11264        56320          22528    0.0135       2.25x                   0.62             11264
+ 12      24576       135168          49152    0.0305       2.26x                   1.31             24576
+ 13      53248       319488         106496    0.0738       2.42x                   2.75             53248
+ 14     114688       745472         229376    0.1723       2.33x                   5.78            114688
+ 15     245760      1720320         491520    0.4009       2.33x                  12.09            245760
+
+Projection from the formulas (states = n*2^(n-1), table = n*2^n entries x 8 bytes):
+   n                 states           table memory
+  20             10,485,760                 0.2 GiB
+  25            419,430,400                 6.2 GiB
+  30         16,106,127,360               240.0 GiB
+  40     21,990,232,555,520           327,680.0 GiB
+ 200          about 10^62.2             impossible
+(number of subsets of 200 locations = 2^200 ~ 1.6e60; the Earth contains only about 1e50 atoms)
+Plain enumeration needs n! routes: n=10 -> 3,628,800,  n=15 -> 1,307,674,368,000,  n=20 -> 2,432,902,008,176,640,000
+DP vs enumeration at n=15: 245,760 states vs 1,307,674,368,000 routes (5320941x fewer)
+
+##############################################################################
+TASK 6.6  SUPPORTING EVIDENCE FOR THE BUSINESS CHANGE (heuristic trial, not required)
+##############################################################################
+12 locations x 20 random maps: nearest-neighbour + 2-opt is on average 1.21% above the DP optimum (worst 20.67%, exact optimum in 18/20 maps)
+200 locations: nearest-neighbour length 13581.7 in 0.0020s; after 2-opt 11633.9 in 0.011s  (valid tour: True)
+The exact DP was NOT run for 200 locations: it would need ~10^62 states.

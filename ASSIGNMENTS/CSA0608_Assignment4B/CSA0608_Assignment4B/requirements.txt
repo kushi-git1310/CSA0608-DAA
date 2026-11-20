@@ -1,0 +1,3 @@
+# Tasks 1-6 use only the Python standard library.
+# Pillow is needed only for make_screenshots.py (renders console output to PNG).
+Pillow>=10.0

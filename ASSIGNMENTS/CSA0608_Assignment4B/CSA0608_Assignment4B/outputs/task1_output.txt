@@ -1,0 +1,130 @@
+##############################################################################
+TASK 1.2  FULL DP TRACE ON A SMALL INSTANCE
+##############################################################################
+Meaning of the columns:
+  i        : sub-problem 'lay out words i..n-1'
+  cand j   : first word of the NEXT line (words i..j-1 form the current line)
+  unused s : W - length of that candidate line
+  s^2 / 0  : penalty of that line (0 if it is the final line)
+  best[j]  : already-solved optimum of the smaller sub-problem j..n-1
+  total    : s^2 + best[j]  -> the minimum over j becomes best[i]
+
+=== Small instance (W = 6, words = 4) ===
+ i word[i]     cand j  unused s  s^2 / 0  best[j]  total  selected
+ 3 ddddd            4         1        0        0      0  <== chosen
+ 2 cc               3         4       16        0     16  <== chosen
+ 1 bb               2         4       16       16     32  
+ 1                  3         1        1        0      1  <== chosen
+ 0 aaa              1         3        9        1     10  <== chosen
+ 0                  2         0        0       16     16  
+best[] table : {0: 10, 1: 1, 2: 16, 3: 0, 4: 0}
+choice[] tbl : {0: 1, 1: 3, 2: 3, 3: 4}
+ Ln |     Words | Unused | Penalty | Text (ruler = width 6)
+----------------------------------------------
+  1 |       0-0 |      3 |       9 | |aaa   |
+  2 |       1-2 |      1 |       1 | |bb cc |
+  3 |       3-3 |      1 |       0 | |ddddd |
+----------------------------------------------
+MINIMUM TOTAL PENALTY = 10   (lines used = 3)
+
+##############################################################################
+TASK 1.1  BASELINE RUN ON THE FULL PARAGRAPH
+##############################################################################
+
+=== Baseline W=40 (W = 40, words = 34) ===
+ Ln |     Words | Unused | Penalty | Text (ruler = width 40)
+--------------------------------------------------------------------------------
+  1 |       0-4 |      4 |      16 | |Dynamic programming solves a problem    |
+  2 |      5-10 |      5 |      25 | |by combining the answers to smaller     |
+  3 |     11-14 |      1 |       1 | |overlapping subproblems and remembering |
+  4 |     15-22 |      1 |       1 | |each answer so that no work is repeated |
+  5 |     23-29 |      3 |       9 | |while a document engine breaks a long   |
+  6 |     30-33 |     15 |       0 | |paragraph into neat lines               |
+--------------------------------------------------------------------------------
+MINIMUM TOTAL PENALTY = 52   (lines used = 6)
+
+best[i] for the first 12 and last 6 sub-problems (state evidence):
+  first : {0: 52, 1: 156, 2: 176, 3: 60, 4: 76, 5: 36, 6: 75, 7: 63, 8: 127, 9: 30, 10: 51, 11: 11}
+  last  : {29: 0, 30: 0, 31: 0, 32: 0, 33: 0, 34: 0}
+Greedy first-fit penalty = 76 with 6 lines  vs DP optimum = 52
+
+##############################################################################
+TASK 1.3  REQUIREMENT CHANGE - PREDICT, THEN RUN
+##############################################################################
+
+PREDICTION for W=30: arrangement changes=True, first change at line 1, total penalty should increase (baseline 52).
+  reasoning: narrower page: line 1 can no longer hold the same words, more (penalised) lines are needed
+
+=== Actual W=30 (W = 30, words = 34) ===
+ Ln |     Words | Unused | Penalty | Text (ruler = width 30)
+----------------------------------------------------------------------
+  1 |       0-2 |      4 |      16 | |Dynamic programming solves    |
+  2 |       3-7 |      4 |      16 | |a problem by combining the    |
+  3 |      8-11 |      0 |       0 | |answers to smaller overlapping|
+  4 |     12-14 |      3 |       9 | |subproblems and remembering   |
+  5 |     15-20 |      3 |       9 | |each answer so that no work   |
+  6 |     21-25 |      2 |       4 | |is repeated while a document  |
+  7 |     26-30 |      0 |       0 | |engine breaks a long paragraph|
+  8 |     31-33 |     15 |       0 | |into neat lines               |
+----------------------------------------------------------------------
+MINIMUM TOTAL PENALTY = 54   (lines used = 8)
+
+PREDICTION for W=50: arrangement changes=True, first change at line 1, total penalty should decrease (baseline 52).
+  reasoning: wider page: line 1 can absorb extra words, fewer penalised lines -> lower penalty
+
+=== Actual W=50 (W = 50, words = 34) ===
+ Ln |     Words | Unused | Penalty | Text (ruler = width 50)
+------------------------------------------------------------------------------------------
+  1 |       0-6 |      1 |       1 | |Dynamic programming solves a problem by combining |
+  2 |      7-12 |      4 |      16 | |the answers to smaller overlapping subproblems    |
+  3 |     13-21 |      4 |      16 | |and remembering each answer so that no work is    |
+  4 |     22-29 |      4 |      16 | |repeated while a document engine breaks a long    |
+  5 |     30-33 |     25 |       0 | |paragraph into neat lines                         |
+------------------------------------------------------------------------------------------
+MINIMUM TOTAL PENALTY = 49   (lines used = 5)
+
+PREDICTION for W=60: arrangement changes=True, first change at line 1, total penalty should decrease (baseline 52).
+  reasoning: even wider page: fewer lines again, more text moves into the free final line
+
+=== Actual W=60 (W = 60, words = 34) ===
+ Ln |     Words | Unused | Penalty | Text (ruler = width 60)
+----------------------------------------------------------------------------------------------------
+  1 |       0-7 |      7 |      49 | |Dynamic programming solves a problem by combining the       |
+  2 |      8-14 |      2 |       4 | |answers to smaller overlapping subproblems and remembering  |
+  3 |     15-25 |      4 |      16 | |each answer so that no work is repeated while a document    |
+  4 |     26-33 |     14 |       0 | |engine breaks a long paragraph into neat lines              |
+----------------------------------------------------------------------------------------------------
+MINIMUM TOTAL PENALTY = 69   (lines used = 4)
+
+PREDICTION vs ACTUAL
+  W | lines | pred.first chg | actual first chg | pred. dir | actual dir | penalty | verdict
+ 30 |     8 |              1 |                1 |  increase |   increase |      54 | MATCH
+ 50 |     5 |              1 |                1 |  decrease |   decrease |      49 | MATCH
+ 60 |     4 |              1 |                1 |  decrease |   increase |      69 | PARTIAL/MISMATCH
+
+##############################################################################
+TASK 1.4  BOUNDARY / FAILURE TESTS
+##############################################################################
+Chosen boundary case: words=['aaaa', 'bbbb', 'cc'], W=9
+  'aaaa bbbb' is EXACTLY 9 characters (unused = 0) and 'cc' is the final line (free).
+  Expected optimum = 0, layout = [aaaa bbbb] / [cc]
+  Correct DP        : 0 ['aaaa bbbb', 'cc']
+  Bug 1 (< not <=)  : 25 ['aaaa', 'bbbb cc']  <-- WRONG (exact fit rejected)
+  Bug 2 (last line penalised): 29 ['aaaa', 'bbbb cc']  <-- WRONG
+  => the single case detects BOTH classic defects; correct DP == brute force == 0 : PASS
+
+Other exceptional inputs:
+  single word that fits   : penalty=0, lines=['hello']
+  single word == width    : penalty=0, lines=['hello']
+  text fits on one line   : penalty=0, lines=['to be or']
+  empty document          : penalty=0, lines=[]
+  word longer than width  : rejected -> WordTooLongError: word 'extraordinary' has length 13 which exceeds the line width 5
+  zero width              : rejected -> ValueError: Line width must be a positive integer
+
+Validation: DP vs exhaustive enumeration on 12-word prefix, widths 14..30
+  W=14: DP= 160  brute-force= 160  OK
+  W=18: DP= 178  brute-force= 178  OK
+  W=22: DP=  19  brute-force=  19  OK
+  W=26: DP=  32  brute-force=  32  OK
+  W=30: DP=  32  brute-force=  32  OK
+ALL MATCH

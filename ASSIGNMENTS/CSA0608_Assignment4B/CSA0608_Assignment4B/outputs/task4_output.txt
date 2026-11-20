@@ -1,0 +1,167 @@
+##############################################################################
+TASK 4.1 / 4.2  BASE CASE
+##############################################################################
+Line 1 processing : [7, 9, 3, 4, 8, 4] 
+Line 2 processing : [8, 5, 6, 4, 5, 7]
+Transfer L1->L2 (after stn 1..5): [2, 3, 1, 3, 4] 
+Transfer L2->L1 (after stn 1..5): [2, 1, 2, 2, 1]
+Entry times       : [2, 4]   Exit times: [3, 2]
+
+=== Base production line ===
+
+DP decision trace (f = fastest finishing time at that station)
+Station 1 : reach Line 1 by entry = 2+7 = 9;   reach Line 2 by entry = 4+8 = 12
+Stn |  L1 stay L1 transfer  L1 chosen   f1 |  L2 stay L2 transfer  L2 chosen   f2
+---------------------------------------------------------------------------------
+  2 |       18          23       stay   18 |       17          16   transfer   16
+  3 |       21          20   transfer   20 |       22          27       stay   22
+  4 |       24          28       stay   24 |       26          25   transfer   25
+  5 |       32          35       stay   32 |       30          32       stay   30
+  6 |       36          35   transfer   35 |       37          43       stay   37
+Exit: via Line 1 = 38, via Line 2 = 39 -> leave from Line 1
+Line chosen at each station : S1:L1 | S2:L2 | S3:L1 | S4:L2 | S5:L2 | S6:L1
+Transfer points             : ['after station 1: Line 1 -> Line 2', 'after station 2: Line 2 -> Line 1', 'after station 3: Line 1 -> Line 2', 'after station 5: Line 2 -> Line 1']
+Entry
+  |
+  v
+Line 1 - Station 1
+  |
+  v  Transfer (cost 2)
+Line 2 - Station 2
+  |
+  v  Transfer (cost 1)
+Line 1 - Station 3
+  |
+  v  Transfer (cost 1)
+Line 2 - Station 4
+  |
+  v
+Line 2 - Station 5
+  |
+  v  Transfer (cost 1)
+Line 1 - Station 6
+  |
+  v
+Exit
+MINIMUM PRODUCTION TIME = 38
+Validation by exhaustive search of 2^6 = 64 routes: optimum = 38, route = [0, 1, 0, 1, 1, 0]  ->  MATCH
+
+Optimal-substructure check: the best route to the LAST station contains the best route to the
+previous station on its line:  f[line][j] uses f[line'][j-1], never a worse earlier schedule.
+
+##############################################################################
+TASK 4.3  PREDICT BEFORE YOU EXECUTE
+##############################################################################
+Experiment: raise transfer time t[L1->L2] after station 1 from 2 to 20
+            (the base route uses exactly this transfer: Line 1 stn 1 -> Line 2 stn 2).
+PREDICTION (recorded before running):
+  * The optimal route WILL change - an 18-unit rise on a 38-unit route is far larger than the few units this transfer saves.
+  * The decision at station 2 (Line 2 'transfer from Line 1') is the one most affected; the route
+    should enter Line 1 and stay on it for stations 1-2, or start on Line 2 from the entry.
+  * Total production time WILL increase, but by LESS than 18 (the transfer increase), because the
+    DP can re-route around the expensive transfer.
+
+=== Modified: t[L1->L2][1] = 20 ===
+
+DP decision trace (f = fastest finishing time at that station)
+Station 1 : reach Line 1 by entry = 2+7 = 9;   reach Line 2 by entry = 4+8 = 12
+Stn |  L1 stay L1 transfer  L1 chosen   f1 |  L2 stay L2 transfer  L2 chosen   f2
+---------------------------------------------------------------------------------
+  2 |       18          23       stay   18 |       17          34       stay   17
+  3 |       21          21       stay   21 |       23          27       stay   23
+  4 |       25          29       stay   25 |       27          26   transfer   26
+  5 |       33          36       stay   33 |       31          33       stay   31
+  6 |       37          36   transfer   36 |       38          44       stay   38
+Exit: via Line 1 = 39, via Line 2 = 40 -> leave from Line 1
+Line chosen at each station : S1:L1 | S2:L1 | S3:L1 | S4:L2 | S5:L2 | S6:L1
+Transfer points             : ['after station 3: Line 1 -> Line 2', 'after station 5: Line 2 -> Line 1']
+Entry
+  |
+  v
+Line 1 - Station 1
+  |
+  v
+Line 1 - Station 2
+  |
+  v
+Line 1 - Station 3
+  |
+  v  Transfer (cost 1)
+Line 2 - Station 4
+  |
+  v
+Line 2 - Station 5
+  |
+  v  Transfer (cost 1)
+Line 1 - Station 6
+  |
+  v
+Exit
+MINIMUM PRODUCTION TIME = 39
+
+OBSERVED: route changed = True, base route [1, 2, 1, 2, 2, 1] -> new route [1, 1, 1, 2, 2, 1]
+          total 38 -> 39 (increase of 1, less than 18 = True)
+          brute-force check: 39
+
+##############################################################################
+TASK 4.4  PRODUCTION DISRUPTION
+##############################################################################
+Base route uses Line 1 at station 3. The machine there slows from 3 to 30.
+
+=== Disrupted: Line 1, station 3 = 30 ===
+
+DP decision trace (f = fastest finishing time at that station)
+Station 1 : reach Line 1 by entry = 2+7 = 9;   reach Line 2 by entry = 4+8 = 12
+Stn |  L1 stay L1 transfer  L1 chosen   f1 |  L2 stay L2 transfer  L2 chosen   f2
+---------------------------------------------------------------------------------
+  2 |       18          23       stay   18 |       17          16   transfer   16
+  3 |       48          47   transfer   47 |       22          27       stay   22
+  4 |       51          28   transfer   28 |       26          52       stay   26
+  5 |       36          36       stay   36 |       31          36       stay   31
+  6 |       40          36   transfer   36 |       38          47       stay   38
+Exit: via Line 1 = 39, via Line 2 = 40 -> leave from Line 1
+Line chosen at each station : S1:L1 | S2:L2 | S3:L2 | S4:L2 | S5:L2 | S6:L1
+Transfer points             : ['after station 1: Line 1 -> Line 2', 'after station 5: Line 2 -> Line 1']
+Entry
+  |
+  v
+Line 1 - Station 1
+  |
+  v  Transfer (cost 2)
+Line 2 - Station 2
+  |
+  v
+Line 2 - Station 3
+  |
+  v
+Line 2 - Station 4
+  |
+  v
+Line 2 - Station 5
+  |
+  v  Transfer (cost 1)
+Line 1 - Station 6
+  |
+  v
+Exit
+MINIMUM PRODUCTION TIME = 39
+
+Route changed? True
+Base route  : [1, 2, 1, 2, 2, 1]
+New route   : [1, 2, 2, 2, 2, 1]
+Transfers   : [(1, 0, 1), (5, 1, 0)]
+Time 38 -> 39  (increase 1; the slowdown itself was 27, so the DP absorbed 26)
+Brute force confirms: 38 -> 39
+
+##############################################################################
+BOUNDARY / FAILURE TESTS
+##############################################################################
+single station (no transfers possible): 5 [1]
+identical lines, free transfers (ties): total 12 route [0, 0, 0] (tie rule 'prefer stay' keeps the plan stable)
+Line 1 always faster -> never leaves it: [0, 0, 0] 3
+huge transfer cost, cheap entry for Line 2 -> stays on Line 2: [1, 1, 1] 3
+  invalid input rejected -> both lines must have the same number of stations
+  invalid input rejected -> each transfer list needs exactly n-1 values
+  invalid input rejected -> times must be non-negative
+  invalid input rejected -> at least one station is required
+Randomised regression: 500 random lines (n=1..9) DP vs brute force -> mismatches = 0

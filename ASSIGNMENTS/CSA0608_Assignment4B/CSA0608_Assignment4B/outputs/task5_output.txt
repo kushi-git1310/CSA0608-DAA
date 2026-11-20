@@ -1,0 +1,106 @@
+##############################################################################
+TASK 5  SAME GRAPH, THREE ALGORITHMS
+##############################################################################
+Graph: 9 facilities A..I, 14 links:  A-B(4), A-C(9), B-C(7), B-D(12), C-D(5), C-E(14), D-E(2), D-F(8), E-G(6), F-G(3), F-H(11), G-H(10), G-I(13), H-I(1)
+
+--- KRUSKAL (global edge list sorted by weight, union-find) ---
+Next safe edge : lightest edge that joins two DIFFERENT components
+State kept     : sorted edge list + disjoint-set (component id of every vertex)
+Growth         : a forest of many fragments that coalesce
+  ACCEPT H-I(1)    joins components rooted H and I  (edges so far 1)
+  ACCEPT D-E(2)    joins components rooted D and E  (edges so far 2)
+  ACCEPT F-G(3)    joins components rooted F and G  (edges so far 3)
+  ACCEPT A-B(4)    joins components rooted A and B  (edges so far 4)
+  ACCEPT C-D(5)    joins components rooted C and D  (edges so far 5)
+  ACCEPT E-G(6)    joins components rooted D and F  (edges so far 6)
+  ACCEPT B-C(7)    joins components rooted A and D  (edges so far 7)
+  reject D-F(8)    both ends already in the same component (would form a cycle)
+  reject A-C(9)    both ends already in the same component (would form a cycle)
+  ACCEPT G-H(10)   joins components rooted D and H  (edges so far 8)
+  MST = ['H-I(1)', 'D-E(2)', 'F-G(3)', 'A-B(4)', 'C-D(5)', 'E-G(6)', 'B-C(7)', 'G-H(10)']   total = 38   stats = {'comparisons': 38, 'find_calls': 36}
+
+--- PRIM from A (one growing tree, priority queue) ---
+Next safe edge : lightest edge with exactly one end inside the tree
+State kept     : in-tree flags + priority queue of frontier edges
+Growth         : ONE tree absorbs one vertex per step
+  start at A; tree = {A}
+  ADD A-B(4)    (cheapest edge leaving tree) -> tree = {A,B}
+  ADD B-C(7)    (cheapest edge leaving tree) -> tree = {A,B,C}
+  ADD C-D(5)    (cheapest edge leaving tree) -> tree = {A,B,C,D}
+  ADD D-E(2)    (cheapest edge leaving tree) -> tree = {A,B,C,D,E}
+  ADD E-G(6)    (cheapest edge leaving tree) -> tree = {A,B,C,D,E,G}
+  ADD F-G(3)    (cheapest edge leaving tree) -> tree = {A,B,C,D,E,F,G}
+  ADD G-H(10)   (cheapest edge leaving tree) -> tree = {A,B,C,D,E,F,G,H}
+  ADD H-I(1)    (cheapest edge leaving tree) -> tree = {A,B,C,D,E,F,G,H,I}
+  MST = ['A-B(4)', 'B-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'G-H(10)', 'H-I(1)']   total = 38   stats = {'pushes': 14, 'pops': 10}
+
+--- BORUVKA (all components pick simultaneously) ---
+Next safe edge : for every component, its lightest outgoing edge (ties broken by edge index)
+State kept     : component id of every vertex + cheapest-edge slot per component
+Growth         : number of components at least halves each round
+ Round 1: 9 components
+    component A* picks A-B(4)
+    component B* picks A-B(4)
+    component C* picks C-D(5)
+    component D* picks D-E(2)
+    component E* picks D-E(2)
+    component F* picks F-G(3)
+    component G* picks F-G(3)
+    component H* picks H-I(1)
+    component I* picks H-I(1)
+    merged: ['A-B(4)', 'C-D(5)', 'D-E(2)', 'F-G(3)', 'H-I(1)']  -> 4 components left
+ Round 2: 4 components
+    component A* picks B-C(7)
+    component C* picks E-G(6)
+    component F* picks E-G(6)
+    component H* picks G-H(10)
+    merged: ['B-C(7)', 'E-G(6)', 'G-H(10)']  -> 1 components left
+  MST = ['A-B(4)', 'C-D(5)', 'D-E(2)', 'F-G(3)', 'H-I(1)', 'B-C(7)', 'E-G(6)', 'G-H(10)']   total = 38   stats = {'rounds': 2, 'edge_scans': 28, 'per_round_components': [9, 4]}
+
+FINAL COMPARISON
+Algorithm   Total  Edge set (sorted)
+Kruskal        38  ['A-B(4)', 'B-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'G-H(10)', 'H-I(1)']
+Prim           38  ['A-B(4)', 'B-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'G-H(10)', 'H-I(1)']
+Boruvka        38  ['A-B(4)', 'B-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'G-H(10)', 'H-I(1)']
+Identical edge sets: True   (distinct weights -> the MST is UNIQUE)
+Brute force over C(14,8) = 3003 subsets: minimum cost = 38, number of MSTs = 1
+
+##############################################################################
+STRESS THE DESIGN - TIES (A-C changed 9->7, F-H changed 11->10)
+##############################################################################
+Modified graph: A-B(4), A-C(7), B-C(7), B-D(12), C-D(5), C-E(14), D-E(2), D-F(8), E-G(6), F-G(3), F-H(10), G-H(10), G-I(13), H-I(1)
+Brute force: minimum cost = 38; number of distinct minimum spanning trees = 4
+   MST: ['A-B(4)', 'A-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'F-H(10)', 'H-I(1)']
+   MST: ['A-B(4)', 'A-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'G-H(10)', 'H-I(1)']
+   MST: ['A-B(4)', 'B-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'F-H(10)', 'H-I(1)']
+   MST: ['A-B(4)', 'B-C(7)', 'C-D(5)', 'D-E(2)', 'E-G(6)', 'F-G(3)', 'G-H(10)', 'H-I(1)']
+
+Run                            Total  Uses          Different tie-edges
+Kruskal, input tie order          38  valid MST     ['A-C(7)', 'F-H(10)']
+Kruskal, reversed tie order       38  valid MST     ['B-C(7)', 'G-H(10)']
+Prim from A                       38  valid MST     ['A-C(7)', 'F-H(10)']
+Prim from I                       38  valid MST     ['A-C(7)', 'F-H(10)']
+Boruvka, low-index ties           38  valid MST     ['A-C(7)', 'F-H(10)']
+Boruvka, high-index ties          38  valid MST     ['B-C(7)', 'G-H(10)']
+
+Distinct edge sets returned = 2; distinct totals = [38]
+=> different edge sets, same cost, ALL correct (each equals one of the brute-force MSTs): True
+
+Boruvka tie-breaking defect demonstration (triangle A-B-C, all weights 1):
+   naive picks (no global tie order): ['A-B', 'B-C', 'C-A'] -> forms a cycle: True
+   with (weight, edge-index) tie-break: ['A-B', 'B-C'] total 2 -> tree, 2 edges
+
+Boundary / failure tests:
+   disconnected graph -> rejected: graph is not connected - no spanning tree exists
+   single vertex      -> 0 0 0
+   two vertices       -> 5 5 5
+   300 random graphs: Kruskal = Prim = Boruvka total cost; disagreements = 0
+
+##############################################################################
+INDUSTRY DECISION - measured work on three environments
+##############################################################################
+Environment                    Kruskal cmp    finds |  Prim pushes    pops array scans |  Boruvka rounds edge scans
+A  sparse  (V=2000, E=3000)          30695     9978 |         3000    2990           - |               5      15000
+B  dense   (V=150,  E=10000)        119889      858 |        10000     280       45000 |               4      40000
+C  large   (V=20000,E=60000)        872820   159820 |        60000   59911           - |               6     360000
+   Boruvka components per round: [20000, 4977, 982, 166, 26, 2]

@@ -1,0 +1,134 @@
+##############################################################################
+TASK 2.1  NORMAL CASE - ratio-greedy gives the optimum
+##############################################################################
+Capacity = 17
+ID   Weight  Value  Value/Wt
+A         5     50    10.000
+B         4     36     9.000
+C         6     42     7.000
+D         3     18     6.000
+E         2     10     5.000
+
+Solution A - Fractional greedy: decision sequence
+step item  ratio  fraction weight used  value gained  note
+   1 A     10.00     1.000           5         50.00  whole item  (cum. weight 5/17)
+   2 B      9.00     1.000           4         36.00  whole item  (cum. weight 9/17)
+   3 C      7.00     1.000           6         42.00  whole item  (cum. weight 15/17)
+   4 D      6.00     0.667           2         12.00  fraction 2/3  (cum. weight 17/17)
+Fractional greedy value = 140.00   unused capacity = 0
+Operations: {'comparisons': 4, 'item_steps': 5}
+
+Greedy applied to 0/1 knapsack: decision sequence
+step item   w    v  ratio  decision               cap left  value so far
+   1 A      5   50  10.00  TAKE                         12            50
+   2 B      4   36   9.00  TAKE                          8            86
+   3 C      6   42   7.00  TAKE                          2           128
+   4 D      3   18   6.00  SKIP (does not fit)           2           128
+   5 E      2   10   5.00  TAKE                          0           138
+Greedy 0/1 value = 138
+
+Solution B - 0/1 DP result
+Chosen items : [('A', 5, 50), ('B', 4, 36), ('C', 6, 42), ('E', 2, 10)]
+Total weight = 17/17   Optimal value = 138
+Operations: {'cell_evaluations': 90, 'comparisons': 70}   table cells = 108
+
+CHECK  fractional greedy = 140.00 (provably optimal for the fractional problem, and an upper bound for 0/1)
+CHECK  greedy-0/1 = 138  DP optimum = 138  -> equal: True
+
+DP table  (rows = items considered, columns = capacity 0..W)
+         0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17
+none     0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+   A     0    0    0    0    0   50   50   50   50   50   50   50   50   50   50   50   50   50
+   B     0    0    0    0   36   50   50   50   50   86   86   86   86   86   86   86   86   86
+   C     0    0    0    0   36   50   50   50   50   86   86   92   92   92   92  128  128  128
+   D     0    0    0   18   36   50   50   54   68   86   86   92  104  104  110  128  128  128
+   E     0    0   10   18   36   50   50   60   68   86   86   96  104  104  114  128  128  138
+
+##############################################################################
+TASK 2.2  BREAK THE GREEDY INTUITION (student-designed counter-example)
+##############################################################################
+Capacity = 15
+ID   Weight  Value  Value/Wt
+L1       10     60     6.000
+L2        7     40     5.714
+L3        8     45     5.625
+L4        1      2     2.000
+
+Solution A - Fractional greedy: decision sequence
+step item  ratio  fraction weight used  value gained  note
+   1 L1     6.00     1.000          10         60.00  whole item  (cum. weight 10/15)
+   2 L2     5.71     0.714           5         28.57  fraction 5/7  (cum. weight 15/15)
+Fractional greedy value = 88.57   unused capacity = 0
+Operations: {'comparisons': 3, 'item_steps': 3}
+
+Greedy applied to 0/1 knapsack: decision sequence
+step item   w    v  ratio  decision               cap left  value so far
+   1 L1    10   60   6.00  TAKE                          5            60
+   2 L2     7   40   5.71  SKIP (does not fit)           5            60
+   3 L3     8   45   5.62  SKIP (does not fit)           5            60
+   4 L4     1    2   2.00  TAKE                          4            62
+Greedy 0/1 value = 62
+
+Solution B - 0/1 DP result
+Chosen items : [('L2', 7, 40), ('L3', 8, 45)]
+Total weight = 15/15   Optimal value = 85
+Operations: {'cell_evaluations': 64, 'comparisons': 38}   table cells = 80
+
+GreedyResult = 62   DPOptimum = 85   GreedyResult != DPOptimum : True
+FIRST FATAL COMMITMENT: step 1 takes L1 (weight 10, ratio 6.00) because it has the best ratio.
+  After it only 5 units remain, and neither L2 (7) nor L3 (8) can fit,
+  yet L2 + L3 together fill exactly 15 units with value 85.  Greedy can never undo a commitment.
+  Greedy reaches 72.9% of the optimum; the fractional bound would have been 88.57.
+  Greedy + best-single-item repair = 62 (still < 85)
+
+DP table  (rows = items considered, columns = capacity 0..W)
+         0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
+none     0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+  L1     0    0    0    0    0    0    0    0    0    0   60   60   60   60   60   60
+  L2     0    0    0    0    0    0    0   40   40   40   60   60   60   60   60   60
+  L3     0    0    0    0    0    0    0   40   45   45   60   60   60   60   60   85
+  L4     0    2    2    2    2    2    2   40   45   47   60   62   62   62   62   85
+
+##############################################################################
+TASK 2.3  ENGINEERING COMPARISON (operation counts, memory, quality, guarantee)
+##############################################################################
+(a) Work and memory as the problem grows (random items, capacity = 40% of total weight)
+    n       W | greedy compares greedy steps  greedy mem(items) |   DP cells DP compares DP mem full DP mem 1-row
+   10      29 |              23            6                 10 |        300         226         330           30
+   50     242 |             215           28                 50 |      12150       11545       12393          243
+  100     985 |             535           58                100 |      98600       96137       99586          986
+  200    2070 |            1266          108                200 |     414200      409024      416271         2071
+  200   20910 |            1245          114                200 |    4182200     4129924     4203111        20911
+
+(b) Effect of the capacity VALUE on the same 100 items (capacity measured in kg vs g)
+  capacity | greedy compares |  DP cell evaluations
+      1013 |             533 |               101400
+     10130 |             533 |              1013100
+    101300 |             533 |             10130100
+
+(c) Solution quality over 1000 random 0/1 instances (n=15, weights 1-30, capacity 35%)
+  greedy found the exact optimum in 517/1000 instances
+  average quality = 98.64% of optimum, worst case = 89.4%
+  greedy + best-single repair optimal in 517/1000, average 98.64%
+
+(d) Summary table
+Criterion             Greedy (fractional / 0-1 heuristic)       DP 0/1
+Computational work    O(n log n): sort + one pass               O(n*W) cell evaluations
+Memory                O(n) - just the item list                 O(n*W) table (O(W) value only)
+Solution quality      optimal for fractional; heuristic for 0/1 always the exact 0/1 optimum
+Guarantee             none for 0/1 (can be far from optimum)    optimal; pseudo-polynomial in W
+
+##############################################################################
+TASK 2.4  CHANGED REQUIREMENT - 'answer extremely quickly, near-optimal is fine'
+##############################################################################
+Fleet-scale instance: n=2000 items, capacity=397197
+  greedy work       : 19247 comparisons
+  DP work would be  : 794396000 cell evaluations (41273x more), table memory 794793198 cells
+  greedy 0/1 = 72090, DP optimum = 72092  ->  greedy is 99.997% of optimal
+Conclusion: use ratio-greedy (+ best-single-item repair) when speed dominates; keep DP for audits.
+
+Boundary tests:
+  capacity 0         -> 0.0 0 0
+  empty item list    -> 0.0 0 0
+  item heavier than W-> 19.8 0 0
+  zero weight item   -> rejected: invalid item Item(item_id='Z', weight=0, value=5): weight must be > 0 and value >= 0

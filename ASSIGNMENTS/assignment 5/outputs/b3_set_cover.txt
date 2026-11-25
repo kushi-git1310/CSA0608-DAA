@@ -1,0 +1,41 @@
+==============================================================================
+B3.1  CORRECTNESS ON SMALL INSTANCES
+==============================================================================
+Instance                      Exact  Greedy  Same?
+1 (hand-made, n=6)                2       2    Yes
+2 (hand-made, n=7)                2       2    Yes
+3 (random seed 11, n=12)          5       5    Yes
+4 (random seed 22, n=12)          4       4    Yes
+5 (random seed 33, n=12)          5       5    Yes
+
+==============================================================================
+B3.2  COUNTEREXAMPLE  (greedy > optimal)
+==============================================================================
+Zones Z1..Z9; C1={1,2,3,4,5}  C2={6,7,8,9}  C3={3,4,5,6,7,8}
+  Optimal cover : ['C1', 'C2'] -> size 2
+  Greedy trace  :
+    pick C3 (covers 6 new zones), uncovered before = 9
+    pick C1 (covers 2 new zones), uncovered before = 3
+    pick C2 (covers 1 new zones), uncovered before = 1
+  Greedy cover  : ['C3', 'C1', 'C2'] -> size 3
+  GreedyCoverSize (3) > OptimalCoverSize (2)
+
+==============================================================================
+B3.3  SCALING  (random instances, zones n, centres m)
+==============================================================================
+   n   m |  Exact combos tested  Exact       ms |  Greedy evals  Greedy      ms | ratio
+  10   8 |                  113      4      0.0 |            32       4    0.01 | 1.00
+  14  12 |                2,582      7      0.6 |            84       7    0.02 | 1.00
+  18  16 |                1,214      4      0.2 |            64       4    0.02 | 1.00
+  22  20 |               62,781      7     13.6 |           140       7    0.03 | 1.00
+  26  24 |               55,730      6     10.9 |           144       6    0.04 | 1.00
+  30  28 |              130,130      6     25.6 |           168       6    0.04 | 1.00
+  34  32 |              148,418      5     35.4 |           160       5    0.06 | 1.00
+  38  34 |            1,541,367      6    457.7 |           238       7    0.11 | 1.17
+
+Projection: combinations an exact enumerator must examine up to size k (m centres)
+     m   k                     sum C(m,1..k)   greedy evals (<= m*k)
+    30   6                           768,211                     180
+    50   8                       655,023,685                     400
+   100  10                19,415,908,147,835                   1,000
+   200  15    15,904,053,809,872,314,720,775                   3,000

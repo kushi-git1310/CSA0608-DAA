@@ -1,0 +1,103 @@
+==============================================================================
+B1.1  VALIDATION TESTS  (Version 1 - input order)
+==============================================================================
+
+T1 colourable graph (6 services, m=3)
+  verifies : normal case: a valid colouring must be found and be conflict-free
+  expected : colouring exists   actual : colouring found   -> PASS
+  colouring: [0, 1, 2, 0, 1, 2]
+  stats    : {'nodes': 7, 'attempts': 12, 'rejected': 6, 'backtracks': 0, 'max_depth': 6}
+
+T2 NOT colourable (K4, m=3)
+  verifies : negative case: exhaustive search must report failure
+  expected : no colouring   actual : no colouring   -> PASS
+  colouring: None
+  stats    : {'nodes': 16, 'attempts': 48, 'rejected': 33, 'backtracks': 15, 'max_depth': 3}
+
+T3 boundary: empty graph n=0, m=1
+  verifies : empty input: trivially colourable, zero search
+  expected : colouring exists   actual : colouring found   -> PASS
+  colouring: []
+  stats    : {'nodes': 1, 'attempts': 0, 'rejected': 0, 'backtracks': 0, 'max_depth': 0}
+
+T4 boundary: single vertex, m=1
+  verifies : smallest non-empty instance
+  expected : colouring exists   actual : colouring found   -> PASS
+  colouring: [0]
+  stats    : {'nodes': 2, 'attempts': 1, 'rejected': 0, 'backtracks': 0, 'max_depth': 1}
+
+T5 boundary: edgeless graph n=5, m=1
+  verifies : no conflicts: one group suffices
+  expected : colouring exists   actual : colouring found   -> PASS
+  colouring: [0, 0, 0, 0, 0]
+  stats    : {'nodes': 6, 'attempts': 5, 'rejected': 0, 'backtracks': 0, 'max_depth': 5}
+
+T6 boundary: one edge, m=1
+  verifies : tight limit: 2 conflicting services cannot share 1 group
+  expected : no colouring   actual : no colouring   -> PASS
+  colouring: None
+  stats    : {'nodes': 2, 'attempts': 2, 'rejected': 1, 'backtracks': 1, 'max_depth': 1}
+
+T7 boundary: n=3 vertices, m=0
+  verifies : no server groups available
+  expected : no colouring   actual : no colouring   -> PASS
+  colouring: None
+  stats    : {'nodes': 1, 'attempts': 0, 'rejected': 0, 'backtracks': 0, 'max_depth': 0}
+
+T8 Petersen graph, m=3
+  verifies : chi=3 -> exactly tight m
+  expected : colouring exists   actual : colouring found   -> PASS
+  colouring: [0, 1, 0, 1, 2, 1, 0, 2, 2, 1]
+  stats    : {'nodes': 11, 'attempts': 20, 'rejected': 10, 'backtracks': 0, 'max_depth': 10}
+
+T9 Petersen graph, m=2
+  verifies : contains odd cycle -> impossible
+  expected : no colouring   actual : no colouring   -> PASS
+  colouring: None
+  stats    : {'nodes': 9, 'attempts': 18, 'rejected': 10, 'backtracks': 8, 'max_depth': 4}
+
+ALL TESTS PASSED
+
+==============================================================================
+B1.3 / B1.4  VERSION 1 (input order)  vs  VERSION 2 (conflict-first order)
+==============================================================================
+
+G1 CLOUD6 (m=3)   result: colourable
+  Measure                  Version 1   Version 2    V1/V2
+  Search nodes                     7           7      1.0
+  Candidate assignments           12          12      1.0
+  Rejected branches                6           6      1.0
+  Backtracks                       0           0      inf
+  Max depth                        6           6      1.0
+
+G2 Petersen, interleaved labels (m=3)   result: colourable
+  Measure                  Version 1   Version 2    V1/V2
+  Search nodes                    11          11      1.0
+  Candidate assignments           20          20      1.0
+  Rejected branches               10          10      1.0
+  Backtracks                       0           0      inf
+  Max depth                       10          10      1.0
+
+G3 Hidden K4 after 8 free vertices (m=3)   result: NOT colourable
+  Measure                  Version 1   Version 2    V1/V2
+  Search nodes                108256          16   6766.0
+  Candidate assignments       324768          48   6766.0
+  Rejected branches           216513          33   6561.0
+  Backtracks                  108255          15   7217.0
+  Max depth                       11           3      3.7
+
+G4 Groetzsch graph (chi=4) (m=3)   result: NOT colourable
+  Measure                  Version 1   Version 2    V1/V2
+  Search nodes                   472         328      1.4
+  Candidate assignments         1416         984      1.4
+  Rejected branches              945         657      1.4
+  Backtracks                     471         327      1.4
+  Max depth                       10          10      1.0
+
+G5 Hidden K5 after 8 free vertices (m=4)   result: NOT colourable
+  Measure                  Version 1   Version 2    V1/V2
+  Search nodes               4281685          65  65872.1
+  Candidate assignments     17126740         260  65872.1
+  Rejected branches         12845056         196  65536.0
+  Backtracks                 4281684          64  66901.3
+  Max depth                       12           4      3.0

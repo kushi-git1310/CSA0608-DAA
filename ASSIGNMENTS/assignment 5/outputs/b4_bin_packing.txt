@@ -1,0 +1,35 @@
+==============================================================================
+B4.1  FFD on a demonstration input
+==============================================================================
+  workload demands W1..W12 = [45, 70, 30, 25, 55, 20, 60, 35, 15, 50, 10, 40]
+  Servers used: 5   (capacity per server = 100)
+   Server  1: workloads W[2, 3] demands=[70, 30] used=100 remaining=0
+   Server  2: workloads W[7, 12] demands=[60, 40] used=100 remaining=0
+   Server  3: workloads W[5, 1] demands=[55, 45] used=100 remaining=0
+   Server  4: workloads W[10, 8, 9] demands=[50, 35, 15] used=100 remaining=0
+   Server  5: workloads W[4, 6, 11] demands=[25, 20, 10] used=55 remaining=45
+  total demand = 455  -> lower bound ceil(sum/C) = 5 servers; exact optimum = 5
+
+==============================================================================
+B4.2  CHALLENGING INPUT (FFD uses more servers than necessary)
+==============================================================================
+  capacity = 20, demands = [10, 9, 7, 7, 6, 5, 4, 4, 4, 4]
+  Servers used: 4   (capacity per server = 20)
+   Server  1: workloads W[3, 8] demands=[10, 9] used=19 remaining=1
+   Server  2: workloads W[1, 6, 10] demands=[7, 7, 6] used=20 remaining=0
+   Server  3: workloads W[7, 2, 4, 5] demands=[5, 4, 4, 4] used=17 remaining=3
+   Server  4: workloads W[9] demands=[4] used=4 remaining=16
+  FFD servers = 4,  exact optimum = 3   -> FFD wastes 1 server(s)
+
+  Known FFD-adversarial pattern (capacity 100): six 44s, six 27s, six 26s
+  (optimal packs one of each per server = 97 units; FFD packs 44+44, 27+27+27, 26+26+26)
+  FFD servers = 7,  exact optimum = 6
+
+==============================================================================
+B4.3  PRODUCTION-SCALE EVIDENCE (random workloads, C = 100)
+==============================================================================
+ workloads  lower bound    FFD     FF     NF   FFD ms   FF ms   NF ms
+       100           54     55     60     73      0.1     0.1     0.0
+      1000          514    520    542    678      5.8     4.0     0.1
+      5000         2531   2549   2601   3331    216.1   232.5     1.5
+     20000        10138  10190  10339  13446   2844.8  1977.2     4.3

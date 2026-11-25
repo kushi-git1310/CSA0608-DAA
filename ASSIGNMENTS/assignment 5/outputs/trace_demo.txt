@@ -1,0 +1,48 @@
+Graph: services S1..S5, conflicts: [('S1', 'S2'), ('S1', 'S3'), ('S2', 'S4'), ('S3', 'S4'), ('S3', 'S5'), ('S4', 'S5')]
+
+----------------------------------------------------------------------
+TRACE with m = 2 server groups
+----------------------------------------------------------------------
+CHOOSE S1 -> group 0  CHECK ok -> ACCEPT, EXPLORE deeper
+  CHOOSE S2 -> group 0  CHECK fail (clash with S1) -> REJECT
+  CHOOSE S2 -> group 1  CHECK ok -> ACCEPT, EXPLORE deeper
+    CHOOSE S3 -> group 0  CHECK fail (clash with S1) -> REJECT
+    CHOOSE S3 -> group 1  CHECK ok -> ACCEPT, EXPLORE deeper
+      CHOOSE S4 -> group 0  CHECK ok -> ACCEPT, EXPLORE deeper
+        CHOOSE S5 -> group 0  CHECK fail (clash with S4) -> REJECT
+        CHOOSE S5 -> group 1  CHECK fail (clash with S3) -> REJECT
+        BACKTRACK: undo S4=0
+      CHOOSE S4 -> group 1  CHECK fail (clash with S2, S3) -> REJECT
+      BACKTRACK: undo S3=1
+    BACKTRACK: undo S2=1
+  BACKTRACK: undo S1=0
+CHOOSE S1 -> group 1  CHECK ok -> ACCEPT, EXPLORE deeper
+  CHOOSE S2 -> group 0  CHECK ok -> ACCEPT, EXPLORE deeper
+    CHOOSE S3 -> group 0  CHECK ok -> ACCEPT, EXPLORE deeper
+      CHOOSE S4 -> group 0  CHECK fail (clash with S2, S3) -> REJECT
+      CHOOSE S4 -> group 1  CHECK ok -> ACCEPT, EXPLORE deeper
+        CHOOSE S5 -> group 0  CHECK fail (clash with S3) -> REJECT
+        CHOOSE S5 -> group 1  CHECK fail (clash with S4) -> REJECT
+        BACKTRACK: undo S4=1
+      BACKTRACK: undo S3=0
+    CHOOSE S3 -> group 1  CHECK fail (clash with S1) -> REJECT
+    BACKTRACK: undo S2=0
+  CHOOSE S2 -> group 1  CHECK fail (clash with S1) -> REJECT
+  BACKTRACK: undo S1=1
+RESULT: no valid assignment
+STATS : {'nodes': 9, 'attempts': 18, 'rejected': 10, 'backtracks': 8, 'max_depth': 4}
+
+----------------------------------------------------------------------
+TRACE with m = 3 server groups
+----------------------------------------------------------------------
+CHOOSE S1 -> group 0  CHECK ok -> ACCEPT, EXPLORE deeper
+  CHOOSE S2 -> group 0  CHECK fail (clash with S1) -> REJECT
+  CHOOSE S2 -> group 1  CHECK ok -> ACCEPT, EXPLORE deeper
+    CHOOSE S3 -> group 0  CHECK fail (clash with S1) -> REJECT
+    CHOOSE S3 -> group 1  CHECK ok -> ACCEPT, EXPLORE deeper
+      CHOOSE S4 -> group 0  CHECK ok -> ACCEPT, EXPLORE deeper
+        CHOOSE S5 -> group 0  CHECK fail (clash with S4) -> REJECT
+        CHOOSE S5 -> group 1  CHECK fail (clash with S3) -> REJECT
+        CHOOSE S5 -> group 2  CHECK ok -> ACCEPT, EXPLORE deeper
+RESULT: {'S1': 0, 'S2': 1, 'S3': 1, 'S4': 0, 'S5': 2}
+STATS : {'nodes': 6, 'attempts': 9, 'rejected': 4, 'backtracks': 0, 'max_depth': 5}

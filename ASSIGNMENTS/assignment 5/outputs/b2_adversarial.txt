@@ -1,0 +1,33 @@
+PREDICTION (written before running)
+  * Graph B needs far more search than Graph A.
+  * Unsuccessful branches arise only at depth 9-12 (when the K4 vertices are reached),
+    i.e. AFTER the 8 unconstrained vertices have been coloured in all 3^8 = 6561 ways.
+  * Pruning happens late in B (feasibility test cannot see the K4 contradiction early),
+    but immediately/never needed in A (every choice keeps a free colour).
+
+==========================================================================
+Graph A (path, easy): n=12, edges=11, m=3  ->  colourable
+   nodes=13 attempts=18 rejected=6 backtracks=0 max_depth=12
+Graph B (hidden K4, hard): n=12, edges=6, m=3  ->  NOT colourable
+   nodes=108,256 attempts=324,768 rejected=216,513 backtracks=108,255 max_depth=11
+==========================================================================
+
+Side-by-side table (Version 1 = input order)
+Measure                Graph A       Graph B
+Search nodes                13       108,256
+Backtracks                   0       108,255
+Rejected branches            6       216,513
+
+Same Graph B, but with the conflict-first ordering (Version 2):
+   nodes=16, backtracks=15, rejected=33
+
+Growth experiment: k free vertices placed BEFORE a K4 (m=3, Version 1)
+ k free    n       nodes   backtracks
+      2    6         148          147
+      3    7         445          444
+      4    8       1,336        1,335
+      5    9       4,009        4,008
+      6   10      12,028       12,027
+      7   11      36,085       36,084
+      8   12     108,256      108,255
+      9   13     324,769      324,768
